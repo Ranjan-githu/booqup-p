@@ -48,6 +48,8 @@ export interface Shop {
   total_reviews: number;
   status: ShopStatus;
   images?: string[];
+  membership_enabled?: boolean;
+  membership_price?: number;
   created_at: string;
   updated_at: string;
   category?: Category;
@@ -103,4 +105,36 @@ export interface ShopAvailability {
   closing_time: string;
   created_at: string;
   updated_at: string;
+}
+
+export type MembershipType = 'monthly' | 'quarterly' | 'yearly';
+export type MembershipStatus = 'active' | 'expired' | 'cancelled';
+
+export interface Message {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  booking_id?: string;
+  subject: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+  sender?: Profile;
+  receiver?: Profile;
+  booking?: Booking;
+}
+
+export interface Membership {
+  id: string;
+  user_id: string;
+  shop_id: string;
+  membership_type: MembershipType;
+  start_date: string;
+  end_date: string;
+  status: MembershipStatus;
+  amount: number;
+  created_at: string;
+  updated_at: string;
+  shop?: Shop;
+  user?: Profile;
 }
