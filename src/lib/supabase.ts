@@ -1,10 +1,55 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Get and trim environment variables
+const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL || '').trim();
+const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim();
 
+// Check if variables are missing
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  const missing = [];
+  if (!supabaseUrl) missing.push('VITE_SUPABASE_URL');
+  if (!supabaseAnonKey) missing.push('VITE_SUPABASE_ANON_KEY');
+  
+  throw new Error(
+    `Missing Supabase environment variables: ${missing.join(', ')}\n\n` +
+    `Please create a .env file in the root directory with:\n` +
+    `VITE_SUPABASE_URL=your_supabase_project_url\n` +
+    `VITE_SUPABASE_ANON_KEY=your_supabase_anon_key\n\n` +
+    `Get these values from: Supabase Dashboard > Project Settings > API`
+  );
+}
+
+// Check if values are still placeholders
+if (supabaseUrl.includes('your_supabase') || supabaseUrl.includes('placeholder') || supabaseUrl === '') {
+  throw new Error(
+    `Invalid Supabase URL: The VITE_SUPABASE_URL in your .env file appears to be a placeholder.\n\n` +
+    `Please replace it with your actual Supabase project URL.\n` +
+    `Get your URL from: Supabase Dashboard > Project Settings > API\n` +
+    `The URL should look like: https://xxxxxxxxxxxxx.supabase.co`
+  );
+}
+
+if (supabaseAnonKey.includes('your_supabase') || supabaseAnonKey.includes('placeholder') || supabaseAnonKey === '') {
+  throw new Error(
+    `Invalid Supabase Anon Key: The VITE_SUPABASE_ANON_KEY in your .env file appears to be a placeholder.\n\n` +
+    `Please replace it with your actual Supabase anon key.\n` +
+    `Get your key from: Supabase Dashboard > Project Settings > API`
+  );
+}
+
+// Validate URL format
+try {
+  const url = new URL(supabaseUrl);
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    throw new Error('URL must use HTTP or HTTPS protocol');
+  }
+} catch (error) {
+  throw new Error(
+    `Invalid Supabase URL format: "${supabaseUrl}" is not a valid HTTP/HTTPS URL.\n\n` +
+    `Please check your .env file and ensure VITE_SUPABASE_URL is a valid URL.\n` +
+    `Example: https://xxxxxxxxxxxxx.supabase.co\n\n` +
+    `Get your URL from: Supabase Dashboard > Project Settings > API`
+  );
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
